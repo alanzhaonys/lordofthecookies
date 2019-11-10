@@ -1,3 +1,10 @@
+//
+// Lord Of The Cookies Arduino Sketch
+// 
+// Author: Alan Zhao
+// Date: 11/10/2019
+//
+
 #include "FastLED.h"
 
 #define pressed LOW
