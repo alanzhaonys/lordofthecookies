@@ -1,11 +1,9 @@
 //
 // Lord Of The Cookies Arduino Sketch
-// 
+//
 // Author: Alan Zhao
 // Date: 11/10/2019
 //
-
-#include "FastLED.h"
 
 #define pressed LOW
 #define unpressed HIGH
@@ -27,10 +25,8 @@ const int actuatorEnable = 5;
 const int actuatorIn1 = 6;
 const int actuatorIn2 = 7;
 
-// LED pins
-const int ledData = 8;
-const int ledCount = 150;
-CRGB leds[ledCount];
+// LED trigger pin
+const int ledTriggerPin = 8;
 
 // Pin #9 is reserved at the moment
 
@@ -164,7 +160,7 @@ void pullActuator() {
 // Push actuator for specified seconds and pull back for the same amount of time
 void runActuator(int seconds) {
   pushActuator();
-  delay(seconds * 1000); 
+  delay(seconds * 1000);
   pullActuator();
   delay(seconds * 1000);
 }
@@ -194,8 +190,8 @@ void setup() {
   pinMode(actuatorIn1, OUTPUT);
   pinMode(actuatorIn2, OUTPUT);
 
-  // Initialize LED
-  FastLED.addLeds<WS2812B, ledData, RGB>(leds, ledCount);
+  // Initialize LED trigger pin
+  pinMode(ledTriggerPin, OUTPUT);
 
   // Initialize slider limit switch pins
   // Not connected = HIGH
@@ -240,6 +236,9 @@ void setup() {
 
   // Disable stepper
   digitalWrite(sliderEnablePin, HIGH);
+
+  // LED on but not flash
+  digitalWrite(ledTriggerPin, HIGH);
 }
 
 void loop() {
@@ -262,6 +261,9 @@ void loop() {
 
       //Serial.println((String)"Button pushed: " + (i + 1));
       //Serial.println((String)"Turns: " + sliderTurn);
+
+      // Flash LED
+      digitalWrite(ledTriggerPin, LOW);
 
       // Enable stepper
       digitalWrite(sliderEnablePin, LOW);
@@ -299,6 +301,9 @@ void loop() {
 
       // Disable stepper
       digitalWrite(sliderEnablePin, HIGH);
+
+      // Stop LED
+      digitalWrite(ledTriggerPin, HIGH);
 
       restart = true;
     }
