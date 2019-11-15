@@ -1,10 +1,11 @@
+#define FASTLED_ALLOW_INTERRUPTS 1
 #include "FastLED.h"
 
 const int ledData = A1;
 const int ledCount = 150;
 CRGB leds[ledCount];
 
-const int triggerPin = 2;
+const int triggerPin = A2;
 
 void setup() {
   // LED setup
@@ -12,7 +13,6 @@ void setup() {
 
   // Trigger pin setup
   pinMode(triggerPin, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(triggerPin), flashing, LOW);
 
   // Starting
   Serial.begin(9600);
@@ -126,16 +126,14 @@ void blink(int effect) {
 }
 
 void loop() {
-  Serial.println(digitalRead(triggerPin));
-  blink(12);
-  //setAll(0, 0, 0);
-}
-
-void flashing() {
-  Serial.println("flashing...");
-  Serial.println(digitalRead(triggerPin));
-  //setAll(0, 0, 0);
-  blink(2);
+  //Serial.println(digitalRead(triggerPin));
+  if (digitalRead(triggerPin) == HIGH) {
+    //Serial.println("Resume LED...");
+    blink(12);
+  } else {
+    //Serial.println("Flashing LED...");
+    blink(14);
+  }
 }
 
 // *************************
@@ -313,9 +311,19 @@ void rainbowCycle(int SpeedDelay) {
   uint16_t i, j;
 
   for (j = 0; j < 256 * 5; j++) { // 5 cycles of all colors on wheel
+    if (digitalRead(triggerPin) == LOW) {
+      break;
+    }
     for (i = 0; i < ledCount; i++) {
+      if (digitalRead(triggerPin) == LOW) {
+        break;
+      }
       c = Wheel(((i * 256 / ledCount) + j) & 255);
       setPixel(i, *c, *(c + 1), *(c + 2));
+    }
+
+    if (digitalRead(triggerPin) == LOW) {
+      break;
     }
     showStrip();
     delay(SpeedDelay);
@@ -366,16 +374,31 @@ void theaterChaseRainbow(int SpeedDelay) {
   byte *c;
 
   for (int j = 0; j < 256; j++) {   // cycle all 256 colors in the wheel
+    if (digitalRead(triggerPin) == HIGH) {
+      break;
+    }
     for (int q = 0; q < 3; q++) {
+      if (digitalRead(triggerPin) == HIGH) {
+        break;
+      }
       for (int i = 0; i < ledCount; i = i + 3) {
+        if (digitalRead(triggerPin) == HIGH) {
+          break;
+        }
         c = Wheel( (i + j) % 255);
         setPixel(i + q, *c, *(c + 1), *(c + 2)); //turn every third pixel on
       }
-      showStrip();
 
+      if (digitalRead(triggerPin) == HIGH) {
+        break;
+      }
+      showStrip();
       delay(SpeedDelay);
 
       for (int i = 0; i < ledCount; i = i + 3) {
+        if (digitalRead(triggerPin) == HIGH) {
+          break;
+        }
         setPixel(i + q, 0, 0, 0);    //turn every third pixel off
       }
     }
