@@ -57,7 +57,10 @@ const int sliderSpeed = 300;
 const int speedFast = sliderSpeed;
 
 // How many turns per button
-float sliderTurns[] = { 6.5, 14, 20, 30, 40, 49 };
+float sliderTurns[] = { 5.5, 14.3, 23, 31.5, 40.1, 48.8 };
+
+// Run actuator for how long
+float runActuatorSeconds = 2.38;
 
 
 //
@@ -158,9 +161,11 @@ void pullActuator() {
 }
 
 // Push actuator for specified seconds and pull back for the same amount of time
-void runActuator(int seconds) {
+void runActuator(float seconds) {
   pushActuator();
   delay(seconds * 1000);
+  stopActuator();
+  delay(2000);
   pullActuator();
   delay(seconds * 1000);
 }
@@ -215,7 +220,7 @@ void setup() {
 
   // Move away a little
   setSliderDir(dirRight);
-  runSliderRevs(1);
+  runSliderRevs(0.1);
 
   // Start homing precedure at start up
   while (digitalRead(sliderHomePin) == unpressed) {
@@ -245,22 +250,22 @@ void loop() {
 
   bool restart = false;
 
-  Serial.println((String)"Slider left: " + digitalRead(sliderLeftPin));
-  Serial.println((String)"Slider right: " + digitalRead(sliderRightPin));
+  //Serial.println((String)"Slider left: " + digitalRead(sliderLeftPin));
+  //Serial.println((String)"Slider right: " + digitalRead(sliderRightPin));
 
   for ( int i = 0; i < numberOfButtonPins; i++) {
     int buttonPin = buttonPins[i];
 
     while (digitalRead(buttonPin) == pressed) {
 
-      //beep(i + 1);
+      beep(i + 1);
 
-      beep(1);
+      //beep(1);
 
       float sliderTurn = sliderTurns[i];
 
-      //Serial.println((String)"Button pushed: " + (i + 1));
-      //Serial.println((String)"Turns: " + sliderTurn);
+      Serial.println((String)"Button pushed: " + (i + 1));
+      Serial.println((String)"Turns: " + sliderTurn);
 
       // Flash LED
       digitalWrite(ledTriggerPin, LOW);
@@ -275,15 +280,8 @@ void loop() {
       //Serial.println((String)"Running " + sliderTurn);
       runSliderRevsAndCheckEnd(sliderTurn);
 
-      //delay(2000);
       // Run actuator
-      runActuator(1);
-
-      // Pull back actuator
-      pullActuator();
-
-      // Run actuator
-      //runActuator(actuatorSeconds);
+      runActuator(runActuatorSeconds);
 
       // Bring slider back
       while (digitalRead(sliderHomePin) == unpressed) {

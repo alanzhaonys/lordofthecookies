@@ -2,7 +2,7 @@
 #include "FastLED.h"
 
 const int ledData = A1;
-const int ledCount = 150;
+const int ledCount = 39;
 CRGB leds[ledCount];
 
 const int triggerPin = A2;
