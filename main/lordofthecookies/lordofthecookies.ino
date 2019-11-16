@@ -57,10 +57,10 @@ const int sliderSpeed = 300;
 const int speedFast = sliderSpeed;
 
 // How many turns per button
-float sliderTurns[] = { 5.5, 14.3, 23, 31.5, 40.1, 48.8 };
+float sliderTurns[] = { 5.1, 13.9, 22.6, 31.1, 39.7, 48.4 };
 
 // Run actuator for how long
-float runActuatorSeconds = 2.38;
+float runActuatorSeconds = 2.45;
 
 
 //
@@ -99,11 +99,24 @@ void runSliderRevs(float revs) {
   stopSlider();
 }
 
+// Read slider right sensor value 3 times to have realible reading, due to interfernces from motor
+bool sliderRightPinPressed() {
+  if (digitalRead(sliderRightPin) == pressed) {
+    if (digitalRead(sliderRightPin) == pressed) {
+      if (digitalRead(sliderRightPin) == pressed) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 // Run the slider motor for specified revolutions, stop if end is reached
 void runSliderRevsAndCheckEnd(float revs) {
   float steps = round(motorStepsPerRev * microSteps * revs);
   for (long x = 0; x < steps; x++) {
-    if (digitalRead(sliderRightPin) == pressed) {
+    if (sliderRightPinPressed()) {
+      beep(3);
       stopSlider();
       break;
     }
@@ -215,12 +228,9 @@ void setup() {
     pinMode(buttonPin, INPUT);
   }
 
-  // Make sure actuator is pulled back
+  // Make sure actuator is fully pulled back
   pullActuator();
-
-  // Move away a little
-  setSliderDir(dirRight);
-  runSliderRevs(0.1);
+  delay(runActuatorSeconds * 1000);
 
   // Start homing precedure at start up
   while (digitalRead(sliderHomePin) == unpressed) {
@@ -258,9 +268,9 @@ void loop() {
 
     while (digitalRead(buttonPin) == pressed) {
 
-      beep(i + 1);
+      //beep(i + 1);
 
-      //beep(1);
+      beep(1);
 
       float sliderTurn = sliderTurns[i];
 
@@ -272,6 +282,11 @@ void loop() {
 
       // Enable stepper
       digitalWrite(sliderEnablePin, LOW);
+
+      // Bring slider back
+      while (digitalRead(sliderHomePin) == unpressed) {
+        sliderComeHome();
+      }
 
       // Set slider direction
       setSliderDir(dirRight);
