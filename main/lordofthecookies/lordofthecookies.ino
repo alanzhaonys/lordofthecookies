@@ -60,7 +60,7 @@ const int speedFast = sliderSpeed;
 float sliderTurns[] = { 5.1, 13.9, 22.6, 31.1, 39.7, 48.4 };
 
 // Run actuator for how long
-float runActuatorSeconds = 2.45;
+float runActuatorSeconds = 2.35;
 
 
 //
